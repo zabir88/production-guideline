@@ -1,0 +1,238 @@
+Build a Rails App use Postgresql & Capistrano+Puma deploy to Ec2
+Pre requisite ruby 2.2.3 or 2.2.1 and rails. 
+
+Installing & setup PostgreSQL(local)
+$sudo apt-get install postgresql postgresql-contrib libpq-dev
+
+Create a Postgresql user
+$sudo -u postgres createuser -s contactbook
+Set user password
+$sudo -u postgres psql
+Inside psql command type
+\password contactbook
+
+Create a db for app
+$sudo -u postgres createdb -O contactbook contactbook_production
+
+Build a rails app use postgresql
+$rails new contactbook -d postgresql
+
+Use sacffold to build basic CDUD function
+$rails g scafflold contact name:string email:string
+And then run
+$rake db:create
+$rake db:migrate
+
+Configuring Puma & Capistrano
+#Open Gemfile 
+
+gem 'figaro'
+gem 'puma'
+group :development do
+  gem 'capistrano'
+  gem 'capistrano3-puma'
+  gem 'capistrano-rails', require: false
+  gem 'capistrano-bundler', require: false
+  gem 'capistrano-rvm'
+end
+
+Then run
+$bundle install
+$cap install STAGES=production
+
+Edit Capfile
+Capfile
+require 'capistrano/bundler'
+require 'capistrano/rvm'
+require 'capistrano/rails/assets' # for asset handling add
+require 'capistrano/rails/migrations' # for running migrations
+require 'capistrano/puma'
+
+Setup assets path in cofig/environments/production.rb
+config.assets.prefix = "/shared/public/assets"
+
+Edit deploy.rb in config/deploy.rb
+
+lock '3.4.0'
+set :application, 'contactbook'
+set :repo_url, 'git@github.com:devdatta/contactbook.git' # Edit this to match your repository
+
+set :branch, :master
+set :deploy_to, '/home/deploy/contactbook'
+set :pty, true
+set :linked_files, %w{config/database.yml config/application.yml}
+set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
+set :keep_releases, 5
+set :rvm_type, :user
+set :rvm_ruby_version, '2.2.3' # Edit this if you are using MRI Ruby
+
+
+set :puma_rackup, -> { File.join(current_path, 'config.ru') }
+set :puma_state, "#{shared_path}/tmp/pids/puma.state"
+set :puma_pid, "#{shared_path}/tmp/pids/puma.pid"
+set :puma_bind, "unix://#{shared_path}/tmp/sockets/puma.sock"    #accept array for multi-bind
+
+set :puma_conf, "#{shared_path}/puma.rb"
+set :puma_access_log, "#{shared_path}/log/puma_error.log"
+set :puma_error_log, "#{shared_path}/log/puma_access.log"
+set :puma_role, :app
+set :puma_env, fetch(:rack_env, fetch(:rails_env, 'production'))
+set :puma_threads, [0, 8]
+set :puma_workers, 0
+set :puma_worker_timeout, nil
+set :puma_init_active_record, true
+set :puma_preload_app, false
+
+Create your ssh key
+$ssh-keygen -C youremail@somewhere.com -t rsa
+skip passphrase
+check:@ ~/.ssh should have 2 key that you gen
+1.id_rsa.pub is a public key
+2.id_rsa is a private key
+
+Setup Ec2 instance and login Ec2 instance
+$ssh -i "path to your_id_rsa" ubuntu@your_public_ip
+$sudo apt-get update
+$sudo apt-get upgrade
+
+Create a user call "deploy"
+$sudo useradd -d /home/deploy -m deploy
+
+Setup deploy's password
+$sudo passwd deploy
+
+Set deploy be a sudoers
+$sudo visudo
+and paste
+deploy ALL=(ALL:ALL) ALL
+
+Let's Ec2 instance able to access github
+gen ssh key by typing 
+$ssh-keygen
+skip passphrase
+Run 
+$cat .ssh/id_rsa.pub
+copy key & paste to your github
+
+Set authorized_keys
+(Capistrano will connect to the Ec2 instance via ssh for deployment)
+$cat ~/.ssh/id_rsa.pub(@local)
+copy key & paste to Ec2 instance
+$nano .ssh/authorized_keys
+
+Install git
+$sudo apt-get install git
+
+Installing & setup Nginx
+
+$sudo apt-get install nginx
+$sudo nano /etc/nginx/sites-available/default
+And paste the following code
+upstream app {
+  # Path to Puma SOCK file, as defined previously
+  server unix:/home/deploy/contactbook/shared/tmp/sockets/puma.sock fail_timeout=0;
+  # edit it to fit your app name
+}
+
+server {
+  listen 80;
+  server_name localhost;
+
+  root /home/deploy/contactbook/public;# edit it to fit your app name
+
+  try_files $uri/index.html $uri @app;
+
+  location / {
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Host $host;
+    proxy_redirect off;
+    proxy_http_version 1.1;
+    proxy_set_header Connection '';
+    proxy_pass http://app;
+  }
+
+  location ~ ^/(assets|fonts|system)/|favicon.ico|robots.txt {
+    gzip_static on;
+    expires max;
+    add_header Cache-Control public;
+  }
+
+  error_page 500 502 503 504 /500.html;
+  client_max_body_size 4G;
+  keepalive_timeout 10;
+}
+
+Installing & setup PostgreSQL(@remote)
+$sudo apt-get install postgresql postgresql-contrib libpq-dev
+Create a Postgresql user
+$sudo -u postgres createuser -s contactbook
+Set user password
+$sudo -u postgres psql
+Inside psql db command type
+\password contactbook
+
+Create a db for app
+$sudo -u postgres createdb -O contactbook contactbook_production
+
+Installing RVM & Ruby(@remote)
+$gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+$\curl -sSL https://get.rvm.io | bash -s stable
+
+Logout deploy & Login again
+$rvm install ruby
+Check Ruby version
+$ruby -v
+
+Install bundler
+$gem install bundler --no-ri --no-rdoc
+
+Caeate some file that Capistrano deploy need
+$mkdir contactbook
+$mkdir -p contactbook/shared/config
+$nano contactbook/shared/config/database.yml
+
+Inside contactbook/shared/config/database.yml type
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: contactbook_production       #edit it to fit your app
+  username: contactbook      #edit it to fit your app name on remote postgresql
+  password: 123456          #edit it to fit your app password on remote psotgresql
+  host: localhost
+  port: 5432
+
+Create application.yml
+$nano contactbook/shared/config/application.yml
+
+application.yml
+SECRET_KEY_BASE: created by your local(use rake secret) 
+
+Install nodejs
+(For Javascript)
+$sudo apt-get install nodejs
+
+Setup local
+In config/deploy/production.rb type
+server '52.2.139.74', user: 'deploy', roles: %w{web app db} #edit server to fit your ec2 instance ip
+
+All set
+Now run git
+$git add -A
+$git commit -m "something your change"
+$git push
+
+Run deploy
+$cap production deploy
+
+Restart Nginx
+Go to remote user and type
+$sudo service nginx restart
+
+Go to your public DNS to check! 
+
+Tada!
+
+
+

@@ -1,0 +1,58 @@
+PRODUCTION
+
+For Heroku deployment using Puma:
+
+#Add GEMS
+group :production do
+  gem 'pg', '~> 0.15'
+  gem 'rails_12factor', '~> 0.0.3'
+  gem 'puma', '~> 2.16'
+end
+
+#Start Heroku
+$ heroku create name_of _your_app
+
+#verify remote 
+$ git remote -v
+
+#Deploy 
+$ git push heroku master
+
+#Migrate your database 
+$heroku run rake db:migrate
+
+#Add Procfile to use puma webserver 
+$echo > Procfile
+
+#In the Procfile add 
+$ bundle exec puma -t 5:5 -p ${PORT:-3000} -e ${RACK_ENV:-development}
+
+# In the command shell run  
+$ echo "RACK_ENV=development" >>.env
+$ echo "PORT=3000" >> .env
+
+#In the command shell run 
+$ echo ".env" >> .gitignore
+$ git add .gitignore
+$ git commit -m "add .env to .gitignore"
+
+#compile assets in production
+$ RAILS_ENV=production rake assets:precompile
+
+#Run the following 
+$ git add -A
+$ git commit -m "use puma via procfile"
+$ git push heroku master
+
+Additional steps 
+To clean up temp files and assets
+
+$ rake assets:clobber
+$ rake tmp:clear
+$ rake tmp:cache:clear
+$ rake tmp:session:clear
+$ rake tmp:sockets:clear
+$ rake db:session:clear 
+
+add heroku in the beginning for each command to do the task in heroku  
+

@@ -1,10 +1,15 @@
-Build a Rails App use Postgresql & Capistrano+Puma deploy to Ec2
-Pre requisite ruby 2.2.3 or 2.2.1 and rails. 
+Build a Rails App use Postgresql & Capistrano+Puma deploy to EC2
+Pre requisite 
+1. ruby 2.2.3 or 2.2.1 and rails 4. (using rvm)
+2. Git installed
+3. Nodejs installed
+4. bundler installed
+5. AWS EC2 instance created.   
 
 #Installing & setup PostgreSQL(local)
 $sudo apt-get install postgresql postgresql-contrib libpq-dev
 
-3Create a Postgresql user
+#Create a Postgresql user
 $sudo -u postgres createuser -s contactbook
 Set user password
 $sudo -u postgres psql

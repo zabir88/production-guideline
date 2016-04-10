@@ -194,7 +194,8 @@ production:
 #Create application.yml
 $nano contactbook/shared/config/application.yml
 application.yml
-SECRET_KEY_BASE: created by your local(use rake secret) 
+SECRET_KEY_BASE: created by your local(use rake secret)
+Add all the secret keys here such as api_keys etc. if you are using figaro gem. 
 
 #Install nodejs(@remote)
 (For Javascript)

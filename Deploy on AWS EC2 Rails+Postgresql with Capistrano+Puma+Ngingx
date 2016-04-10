@@ -1,5 +1,5 @@
 Build a Rails App use Postgresql & Capistrano+Puma deploy to EC2
-Pre-requisite 
+Pre-requisite on your local machine 
 1. ruby 2.2.3 or 2.2.1 and rails 4. (using rvm)
 2. Git installed
 3. Nodejs installed
@@ -82,7 +82,9 @@ set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
 
-#Setup Ec2 instance and login Ec2 instance
+#Setup and login to the Ec2 instance
+$chmod 400 /path/my-key-pair.pem #if this step not done then access denied message will be shown on login to the instance.
+nowinstance login to the 
 $ssh -i "path to your_id_rsa" ubuntu@your_public_ip
 $sudo apt-get update
 $sudo apt-get upgrade
@@ -96,7 +98,9 @@ $sudo visudo
 and paste
 deploy ALL=(ALL:ALL) ALL
 
-#Let's Ec2 instance able to access github
+#Let Ec2 instance able to access github
+login to the deploy user that was just created
+$su - deploy
 gen ssh key by typing 
 $ssh-keygen
 skip passphrase
@@ -167,9 +171,11 @@ $sudo -u postgres createdb -O contactbook contactbook_production
 #Installing RVM & Ruby(@remote)
 $gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
 $\curl -sSL https://get.rvm.io | bash -s stable
+$source ~/.rvm/scripts/rvm
 
 #Logout deploy & Login again
-$rvm install ruby
+$rvm install 2.2.3 #to install ruby 2.2.3 Change to your version 
+$rvm use 2.2.3 --default
 Check Ruby version
 $ruby -v
 
@@ -186,8 +192,8 @@ production:
   adapter: postgresql
   encoding: unicode
   database: contactbook_production       #edit it to fit your app
-  username: contactbook      #edit it to fit your app name on remote postgresql
-  password: 123456          #edit it to fit your app password on remote psotgresql
+  username: contactbook                  #edit it to fit your app name on remote postgresql
+  password: 123456                       #edit it to fit your app password on remote postgresql
   host: localhost
   port: 5432
 

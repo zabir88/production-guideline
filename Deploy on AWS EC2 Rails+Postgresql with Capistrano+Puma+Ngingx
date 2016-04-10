@@ -54,7 +54,7 @@ require 'capistrano/rails/assets' # for asset handling add
 require 'capistrano/rails/migrations' # for running migrations
 require 'capistrano/puma'
 
-#Setup assets path in cofig/application.rb
+#Setup assets path in cofig/environments/production.rb
 config.assets.prefix = "shared/public/assets" #donot use / before shared
 
 #Edit deploy.rb in config/deploy.rb

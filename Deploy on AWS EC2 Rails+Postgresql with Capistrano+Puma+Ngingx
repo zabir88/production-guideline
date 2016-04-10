@@ -1,6 +1,7 @@
-Build a Rails App use Postgresql & Capistrano+Puma deploy to EC2
+Rails application with Postgresql deploy to AWS EC2 using Capistrano+Puma+Nginx
+
 Pre-requisite on your local machine 
-1. ruby 2.2.3 or 2.2.1 and rails 4. (using rvm)
+1. ruby 2.2.3 or 2.2.1 and rails 4. (using rvm) installed
 2. Git installed
 3. Nodejs installed
 4. bundler installed
@@ -42,6 +43,7 @@ end
 
 Then run
 $bundle install
+To install capistrano run
 $cap install STAGES=production
 
 #Edit Capfile

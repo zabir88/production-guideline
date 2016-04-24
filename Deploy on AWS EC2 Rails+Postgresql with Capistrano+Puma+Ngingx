@@ -55,7 +55,7 @@ require 'capistrano/rails/migrations' # for running migrations
 require 'capistrano/puma'
 
 #Setup assets path in cofig/environments/production.rb
-config.assets.prefix = "shared/public/assets" #donot use / before shared
+config.assets.prefix = "/shared/public/assets" 
 
 #Edit deploy.rb in config/deploy.rb
 lock '3.4.0'
@@ -69,7 +69,6 @@ set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public
 set :keep_releases, 5
 set :rvm_type, :user
 set :rvm_ruby_version, '2.2.3' # Edit this if you are using MRI Ruby
-set :assets_prefix, "shared/public/assets"
 set :puma_rackup, -> { File.join(current_path, 'config.ru') }
 set :puma_state, "#{shared_path}/tmp/pids/puma.state"
 set :puma_pid, "#{shared_path}/tmp/pids/puma.pid"
@@ -162,21 +161,21 @@ server {
 #Installing & setup PostgreSQL(@remote)
 $sudo apt-get install postgresql postgresql-contrib libpq-dev
 Create a Postgresql user
-$sudo -u postgres createuser -s contactbook
+$sudo -u postgres createuser -s deploy #name pg user the same as machine user
 Set user password
 $sudo -u postgres psql
 Inside psql db command type
-\password contactbook
+\password deploy
 
 #Create a db for app(@remote)
-$sudo -u postgres createdb -O contactbook contactbook_production
+$sudo -u postgres createdb -O deploy contactbook_production
 
 #Installing RVM & Ruby(@remote)
 $gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
 $\curl -sSL https://get.rvm.io | bash -s stable
 $source ~/.rvm/scripts/rvm
 
-#Logout deploy & Login again
+#Logout deploy ubuntu user & Login again
 $rvm install 2.2.3 #to install ruby 2.2.3 Change to your version 
 $rvm use 2.2.3 --default
 Check Ruby version
@@ -195,7 +194,7 @@ production:
   adapter: postgresql
   encoding: unicode
   database: contactbook_production       #edit it to fit your app
-  username: contactbook                  #edit it to fit your app name on remote postgresql
+  username: deploy                       #edit it to fit your app name on remote postgresql
   password: 123456                       #edit it to fit your app password on remote postgresql
   host: localhost
   port: 5432

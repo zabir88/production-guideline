@@ -5,7 +5,9 @@ Pre-requisite on your local machine
 2. Git installed
 3. Nodejs installed
 4. bundler installed
-5. AWS EC2 instance created   
+5. AWS EC2 instance created  
+
+#Configure Puma first. Follow the steps from the file Deploy on Heroku Rails+ Postgresql with Puma.  
 
 #Installing & setup PostgreSQL(local)
 $sudo apt-get install postgresql postgresql-contrib libpq-dev

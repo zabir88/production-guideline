@@ -1,14 +1,16 @@
 Rails application with Postgresql deploy to AWS EC2 using Capistrano+Puma+Nginx
 
+
 Pre-requisite on your local machine 
+
 1. ruby 2.2.3 or 2.2.1 and rails 4. (using rvm) installed
 2. Git installed
 3. Nodejs installed
 4. bundler installed
 5. AWS EC2 instance created  
+6. Puma configured (Follow the steps from the file Deploy on Heroku Rails+ Postgresql with Puma.)
 
-#Configure Puma first. Follow the steps from the file Deploy on Heroku Rails+ Postgresql with Puma.  
-
+  
 #Installing & setup PostgreSQL(local)
 $sudo apt-get install postgresql postgresql-contrib libpq-dev
 
@@ -57,12 +59,13 @@ require 'capistrano/rails/migrations' # for running migrations
 require 'capistrano/puma'
 
 #Setup assets path in cofig/environments/production.rb
-config.assets.prefix = "/shared/public/assets" 
+config.assets.prefix = "/shared/public/assets" (Dont add this in the first capistrano deployment. Add it the second deployment.)
 
 #Edit deploy.rb in config/deploy.rb
-lock '3.4.0'
+lock '3.5.0'
 set :application, 'contactbook'
 set :repo_url, 'git@github.com:devdatta/contactbook.git' # Edit this to match your repository
+set :ssh_options, { forward_agent: true }
 set :branch, :master
 set :deploy_to, '/home/deploy/contactbook'
 set :pty, true

@@ -152,7 +152,7 @@ server {
     proxy_pass http://app;
   }
 
-  location ~ ^/(assets|fonts|system)/|favicon.ico|robots.txt {
+  location ^~ /assets/ {        #fix for robots.txt to be crawled
     gzip_static on;
     expires max;
     add_header Cache-Control public;
@@ -162,6 +162,14 @@ server {
   client_max_body_size 4G;
   keepalive_timeout 10;
 }
+
+server{
+  listen 80;
+  sever_name www.example.com;
+  return 301 https://example.com;
+}
+
+#check with curl -I www.example.com where is it redirected
 
 #Installing & setup PostgreSQL(@remote)
 $sudo apt-get install postgresql postgresql-contrib libpq-dev

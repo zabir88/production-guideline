@@ -59,12 +59,12 @@ New Ubuntu 16.04 setup guideline
 * sudo -u postgres psql
 * \password zabir (to set password for the user created)
 
-## Install Unity Tweak Tool, contacts, calendar, stacer
+## Install Unity Tweak Tool, Chrome, Contacts, Calendar, Stacer
 
 ## Sync online account(google) with ubuntu
  
 ## cd ~ && mkdir .themes (unzip custom themes in this folder to get access from Unity Tweak Tool)
 
-
+## Add Files, Mozilla, Chrome, Sublime, Geddit, Calendar, Contacts, Calculator, PgAdmin3, Software Center to Dock.
 
 

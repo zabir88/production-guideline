@@ -1,4 +1,4 @@
-# Guideline to deploy on cloud server
+# Guideline to deploy Rails app on cloud server
 
 ## Aws
 ### Pre-requisite on your local machine 

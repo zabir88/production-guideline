@@ -1,6 +1,6 @@
 # Guideline to deploy Rails app on cloud server
 
-## Aws
+# Aws
 ### Pre-requisite on your local machine 
 1. ruby 2.2.3 or 2.2.1 and rails 4. (using rvm) installed
 2. Git installed
@@ -142,7 +142,7 @@ application.yml
 SECRET_KEY_BASE: created by your local(use rake secret)
 Add all the secret keys here such as api_keys etc. if you are using figaro gem.
 
-## Heroku
+# Heroku
 ### Add these to GEM file
 ```
 group :production do
@@ -200,5 +200,3 @@ $ git add -A
 $ git commit -m "use puma via procfile"
 $ git push heroku master
 ```
-
-

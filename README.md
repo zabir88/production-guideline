@@ -1,7 +1,7 @@
 # Guideline to deploy Rails app on cloud server
 
 # Aws
-### Pre-requisite on your local machine 
+#### Pre-requisite on your local machine 
 1. ruby 2.2.3 or 2.2.1 and rails 4. (using rvm) installed
 2. Git installed
 3. Nodejs installed
@@ -9,7 +9,7 @@
 5. AWS EC2 instance created
 6. Puma configured (Follow the steps from the file Deploy on Heroku Rails+ Postgresql with Puma.)
 
-### Configuring Puma & Capistrano
+#### Configuring Puma & Capistrano
 Include thesse in GEM file
 ```
 gem 'figaro' # for env variables 
@@ -26,7 +26,7 @@ Run
 ```
 cap install STAGES=production
 ```
-### Edit deploy.rb in config/deploy.rb
+#### Edit deploy.rb in config/deploy.rb
 ```
 lock '3.5.0'
 set :application, 'contactbook'
@@ -70,7 +70,7 @@ desc 'run rake assets precompile task'
 end
  ```
 
-### Login to your server, create a user for the app
+#### Login to your server, create a user for the app
 ```
 ssh -i your_ec2_key.pem adminuser@yourserver.com
 ```
@@ -91,9 +91,9 @@ sudo chown -R myappuser: ~myappuser/.ssh
 sudo chmod 700 ~myappuser/.ssh
 sudo sh -c "chmod 600 ~myappuser/.ssh/*"
 ```
-### Install Git on the server
+#### Install Git on the server
 
-### Let EC-2 instance able to access github
+#### Let EC-2 instance able to access github
 1. login to the myappuser that was just created
 ```
 $su - myappuser
@@ -107,7 +107,7 @@ $ssh-keygen
 $ cat .ssh/id_rsa.pub
 ```
 
-### Set authorized_keys
+#### Set authorized_keys
 (Capistrano will connect to the EC2 instance via ssh for deployment)
 ```
 $ cat ~/.ssh/id_rsa.pub(@local)
@@ -116,14 +116,14 @@ copy key & paste to Ec2 instance
 ```
 $ nano .ssh/authorized_keys
 ```
-### Create some file that Capistrano deploy need
+#### Create some file that Capistrano deploy need
 ```
 $ mkdir <app-name>
 $ mkdir -p <app-name>/shared/config
 $ nano <app-name>/shared/config/database.yml
 ```
 
-### Inside <app-name>/shared/config/database.yml 
+#### Inside <app-name>/shared/config/database.yml 
 ```
 production:
   adapter: postgresql
@@ -134,7 +134,7 @@ production:
   host: localhost
   port: 5432
 ```
-### Create application.yml
+#### Create application.yml
 ```
 $ nano contactbook/shared/config/application.yml
 ```
@@ -143,7 +143,7 @@ SECRET_KEY_BASE: created by your local(use rake secret)
 Add all the secret keys here such as api_keys etc. if you are using figaro gem.
 
 # Heroku
-### Add these to GEM file
+#### Add these to GEM file
 ```
 group :production do
   gem 'pg', '~> 0.15'
@@ -151,50 +151,50 @@ group :production do
   gem 'puma', '~> 2.16'
 end
 ```
-### Start Heroku
+#### Start Heroku
 ```
 $ heroku create <app-name>
 ```
-### Verify remote 
+#### Verify remote 
 $ git remote -v
 
-### Deploy 
+#### Deploy 
 ```
 $ git push heroku master
 ```
-### Migrate your database on server
+#### Migrate your database on server
 ```
 $ heroku run rake db:migrate
 ```
-### Add Procfile to use puma webserver 
+#### Add Procfile to use puma webserver 
 ```
 $ echo > Procfile
 ```
-### Procfile content 
+#### Procfile content 
 ```
 $ bundle exec puma -t 5:5 -p ${PORT:-3000} -e ${RACK_ENV:-development}
 ```
-### In the command shell run  
+#### In the command shell run  
 ```
 $ echo "RACK_ENV=development" >>.env
 $ echo "PORT=3000" >> .env
 ```
-### In the command shell run 
+#### In the command shell run 
 ```
 $ echo ".env" >> .gitignore
 $ git add .gitignore
 $ git commit -m "add .env to .gitignore"
 ```
-### Add Figaro Gem env configuration
+#### Add Figaro Gem env configuration
 ```
 $ figaro heroku:set -e production
 ```
-### Compile assets in production
+#### Compile assets in production
 ```
 $ RAILS_ENV=production rake assets:precompile
 ```
 
-### Run the following 
+#### Run the following 
 ```
 $ git add -A
 $ git commit -m "use puma via procfile"

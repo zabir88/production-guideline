@@ -1,6 +1,6 @@
 # Guideline to deploy Rails app on cloud server
 
-# Aws
+# AWS
 #### Pre-requisite on your local machine 
 1. ruby 2.2.3 or 2.2.1 and rails 4. (using rvm) installed
 2. Git installed

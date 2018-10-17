@@ -179,22 +179,22 @@ $ bundle exec puma -t 5:5 -p ${PORT:-3000} -e ${RACK_ENV:-development}
 $ echo "RACK_ENV=development" >>.env
 $ echo "PORT=3000" >> .env
 ```
-###In the command shell run 
+### In the command shell run 
 ```
 $ echo ".env" >> .gitignore
 $ git add .gitignore
 $ git commit -m "add .env to .gitignore"
 ```
-###Add Figaro Gem env configuration
+### Add Figaro Gem env configuration
 ```
 $ figaro heroku:set -e production
 ```
-###Compile assets in production
+### Compile assets in production
 ```
 $ RAILS_ENV=production rake assets:precompile
 ```
 
-###Run the following 
+### Run the following 
 ```
 $ git add -A
 $ git commit -m "use puma via procfile"

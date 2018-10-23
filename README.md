@@ -1,6 +1,6 @@
 # Guideline to deploy Rails app on cloud server
-1. AWS
-2. Heroku
+1. [AWS]AWS
+2. [Heroku]Heroku
 # AWS
 #### Pre-requisite on your local machine 
 1. ruby 2.2.3 or 2.2.1 and rails 4. (using rvm) installed

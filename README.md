@@ -9,7 +9,6 @@
 4. bundler installed
 5. AWS EC2 instance created
 6. Puma configured (Follow the steps from the file Deploy on Heroku Rails+ Postgresql with Puma.)
-
 #### Configuring Puma & Capistrano
 Include thesse in GEM file
 ```
@@ -124,7 +123,7 @@ $ mkdir -p <app-name>/shared/config
 $ nano <app-name>/shared/config/database.yml
 ```
 
-#### Inside <app-name>/shared/config/database.yml 
+#### Inside ```<app-name>/shared/config/database.yml``` 
 ```
 production:
   adapter: postgresql
@@ -139,65 +138,47 @@ production:
 ```
 $ nano contactbook/shared/config/application.yml
 ```
-application.yml
-SECRET_KEY_BASE: created by your local(use rake secret)
 Add all the secret keys here such as api_keys etc. if you are using figaro gem.
 
-# Heroku
-#### Add these to GEM file
+# Heroku(using Rails 5 as Api and React as client side framework)
+#### Add a package.json file in the root directory of the app and enter 
 ```
-group :production do
-  gem 'pg', '~> 0.15'
-  gem 'rails_12factor', '~> 0.0.3'
-  gem 'puma', '~> 2.16'
-end
+{
+  "name": "react-and-rails",
+  "engines": {
+    "node": "6.3.1"
+  },
+  "scripts": {
+    "build": "cd client && npm install && npm run build && cd ..",
+    "deploy": "cp -a client/build/. public/",
+    "postinstall": "npm run build && npm run deploy && echo 'Client built!'"
+  }
+}
 ```
 #### Start Heroku
 ```
 $ heroku create <app-name>
 ```
 #### Verify remote 
+```
 $ git remote -v
-
+```
+#### Tell Heroku to start by building the node app using package.json, and then build the rails app
+```
+heroku buildpacks:add heroku/nodejs --index 1
+heroku buildpacks:add heroku/ruby --index 2
+```
+#### Add a Procfile in the root directory of the app and tell heroku how to start the rails app
+```
+web: bundle exec rails s
+```
 #### Deploy 
 ```
+$ git add .
+$ git commit -m "ready for first push to heroku"
 $ git push heroku master
 ```
 #### Migrate your database on server
 ```
 $ heroku run rake db:migrate
-```
-#### Add Procfile to use puma webserver 
-```
-$ echo > Procfile
-```
-#### Procfile content 
-```
-$ bundle exec puma -t 5:5 -p ${PORT:-3000} -e ${RACK_ENV:-development}
-```
-#### In the command shell run  
-```
-$ echo "RACK_ENV=development" >>.env
-$ echo "PORT=3000" >> .env
-```
-#### In the command shell run 
-```
-$ echo ".env" >> .gitignore
-$ git add .gitignore
-$ git commit -m "add .env to .gitignore"
-```
-#### Add Figaro Gem env configuration
-```
-$ figaro heroku:set -e production
-```
-#### Compile assets in production
-```
-$ RAILS_ENV=production rake assets:precompile
-```
-
-#### Run the following 
-```
-$ git add -A
-$ git commit -m "use puma via procfile"
-$ git push heroku master
 ```
